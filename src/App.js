@@ -8,6 +8,7 @@ import './App.css';
 
 // GraphQL endpoint: https://ekm6fg4dcrfa5olovw7joczefq.appsync-api.us-east-1.amazonaws.com/graphql
 // GraphQL API KEY: da2-q6wyx3ufbnfdpfct5o7obr5z6a
+// https://github.com/aws-samples/aws-mobile-appsync-events-starter-react
 
 Amplify.configure(aws_exports);
 

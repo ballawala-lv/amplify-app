@@ -14,3 +14,8 @@ type Comment @model {
   content: String
   post: Post @connection(name: "PostComments")
 }
+
+type Test @model {
+  id: ID!
+  content: String
+}

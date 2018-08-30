@@ -14,3 +14,15 @@ type Comment @model {
   content: String
   post: Post @connection(name: "PostComments")
 }
+
+type Test @model {
+  id: ID!
+  content: String
+  comments: OtherTest @connection(name: "TestOtherTest")
+}
+
+type OtherTest @model {
+  id: ID!
+  title: String!
+  test: Test @connection(name: "TestOtherTest")
+}

@@ -141,6 +141,86 @@
             "Type": "String",
             "Description": "The S3 location for the Resolver: Mutation.deleteComment.response"
         },
+        "QueryGetTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.getTest.request"
+        },
+        "QueryGetTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.getTest.response"
+        },
+        "QueryListTestsRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.listTests.request"
+        },
+        "QueryListTestsResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.listTests.response"
+        },
+        "MutationCreateTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.createTest.request"
+        },
+        "MutationCreateTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.createTest.response"
+        },
+        "MutationUpdateTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.updateTest.request"
+        },
+        "MutationUpdateTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.updateTest.response"
+        },
+        "MutationDeleteTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.deleteTest.request"
+        },
+        "MutationDeleteTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.deleteTest.response"
+        },
+        "QueryGetOtherTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.getOtherTest.request"
+        },
+        "QueryGetOtherTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.getOtherTest.response"
+        },
+        "QueryListOtherTestsRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.listOtherTests.request"
+        },
+        "QueryListOtherTestsResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Query.listOtherTests.response"
+        },
+        "MutationCreateOtherTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.createOtherTest.request"
+        },
+        "MutationCreateOtherTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.createOtherTest.response"
+        },
+        "MutationUpdateOtherTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.updateOtherTest.request"
+        },
+        "MutationUpdateOtherTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.updateOtherTest.response"
+        },
+        "MutationDeleteOtherTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.deleteOtherTest.request"
+        },
+        "MutationDeleteOtherTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Mutation.deleteOtherTest.response"
+        },
         "BlogPostsRequest": {
             "Type": "String",
             "Description": "The S3 location for the Resolver: Blog.posts.request"
@@ -172,6 +252,22 @@
         "CommentPostResponse": {
             "Type": "String",
             "Description": "The S3 location for the Resolver: Comment.post.response"
+        },
+        "TestCommentsRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Test.comments.request"
+        },
+        "TestCommentsResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: Test.comments.response"
+        },
+        "OtherTestTestRequest": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: OtherTest.test.request"
+        },
+        "OtherTestTestResponse": {
+            "Type": "String",
+            "Description": "The S3 location for the Resolver: OtherTest.test.response"
         }
     },
     "Resources": {
@@ -1128,6 +1224,584 @@
             },
             "DependsOn": "GraphQLSchema"
         },
+        "TestTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "Test",
+                            {
+                                "Fn::GetAtt": [
+                                    "GraphQLAPI",
+                                    "ApiId"
+                                ]
+                            }
+                        ]
+                    ]
+                },
+                "KeySchema": [
+                    {
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "WriteCapacityUnits": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    }
+                },
+                "StreamSpecification": {
+                    "StreamViewType": "NEW_AND_OLD_IMAGES"
+                }
+            }
+        },
+        "TestIAMRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "TestTable",
+                            "role",
+                            {
+                                "Fn::GetAtt": [
+                                    "GraphQLAPI",
+                                    "ApiId"
+                                ]
+                            }
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "appsync.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "DynamoDBAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "dynamodb:BatchGetItem",
+                                        "dynamodb:BatchWriteItem",
+                                        "dynamodb:PutItem",
+                                        "dynamodb:DeleteItem",
+                                        "dynamodb:GetItem",
+                                        "dynamodb:Scan",
+                                        "dynamodb:Query",
+                                        "dynamodb:UpdateItem"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::GetAtt": [
+                                                "TestTable",
+                                                "Arn"
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "/",
+                                                [
+                                                    {
+                                                        "Fn::GetAtt": [
+                                                            "TestTable",
+                                                            "Arn"
+                                                        ]
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "TestDataSource": {
+            "Type": "AWS::AppSync::DataSource",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "Name": "TestTable",
+                "Type": "AMAZON_DYNAMODB",
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "TestIAMRole",
+                        "Arn"
+                    ]
+                },
+                "DynamoDBConfig": {
+                    "AwsRegion": {
+                        "Fn::Select": [
+                            3,
+                            {
+                                "Fn::Split": [
+                                    ":",
+                                    {
+                                        "Fn::GetAtt": [
+                                            "TestTable",
+                                            "Arn"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "TableName": {
+                        "Ref": "TestTable"
+                    }
+                }
+            }
+        },
+        "GetTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "TestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "getTest",
+                "TypeName": "Query",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "QueryGetTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "QueryGetTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "ListTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "TestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "listTests",
+                "TypeName": "Query",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "QueryListTestsRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "QueryListTestsResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "CreateTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "TestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "createTest",
+                "TypeName": "Mutation",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "MutationCreateTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "MutationCreateTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "UpdateTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "TestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "updateTest",
+                "TypeName": "Mutation",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "MutationUpdateTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "MutationUpdateTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "DeleteTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "TestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "deleteTest",
+                "TypeName": "Mutation",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "MutationDeleteTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "MutationDeleteTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "OtherTestTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "TableName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OtherTest",
+                            {
+                                "Fn::GetAtt": [
+                                    "GraphQLAPI",
+                                    "ApiId"
+                                ]
+                            }
+                        ]
+                    ]
+                },
+                "KeySchema": [
+                    {
+                        "AttributeName": "id",
+                        "KeyType": "HASH"
+                    }
+                ],
+                "AttributeDefinitions": [
+                    {
+                        "AttributeName": "id",
+                        "AttributeType": "S"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "WriteCapacityUnits": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    }
+                },
+                "StreamSpecification": {
+                    "StreamViewType": "NEW_AND_OLD_IMAGES"
+                }
+            }
+        },
+        "OtherTestIAMRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Join": [
+                        "-",
+                        [
+                            "OtherTestTable",
+                            "role",
+                            {
+                                "Fn::GetAtt": [
+                                    "GraphQLAPI",
+                                    "ApiId"
+                                ]
+                            }
+                        ]
+                    ]
+                },
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                        {
+                            "Effect": "Allow",
+                            "Principal": {
+                                "Service": "appsync.amazonaws.com"
+                            },
+                            "Action": "sts:AssumeRole"
+                        }
+                    ]
+                },
+                "Policies": [
+                    {
+                        "PolicyName": "DynamoDBAccess",
+                        "PolicyDocument": {
+                            "Version": "2012-10-17",
+                            "Statement": [
+                                {
+                                    "Effect": "Allow",
+                                    "Action": [
+                                        "dynamodb:BatchGetItem",
+                                        "dynamodb:BatchWriteItem",
+                                        "dynamodb:PutItem",
+                                        "dynamodb:DeleteItem",
+                                        "dynamodb:GetItem",
+                                        "dynamodb:Scan",
+                                        "dynamodb:Query",
+                                        "dynamodb:UpdateItem"
+                                    ],
+                                    "Resource": [
+                                        {
+                                            "Fn::GetAtt": [
+                                                "OtherTestTable",
+                                                "Arn"
+                                            ]
+                                        },
+                                        {
+                                            "Fn::Join": [
+                                                "/",
+                                                [
+                                                    {
+                                                        "Fn::GetAtt": [
+                                                            "OtherTestTable",
+                                                            "Arn"
+                                                        ]
+                                                    },
+                                                    "*"
+                                                ]
+                                            ]
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    }
+                ]
+            }
+        },
+        "OtherTestDataSource": {
+            "Type": "AWS::AppSync::DataSource",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "Name": "OtherTestTable",
+                "Type": "AMAZON_DYNAMODB",
+                "ServiceRoleArn": {
+                    "Fn::GetAtt": [
+                        "OtherTestIAMRole",
+                        "Arn"
+                    ]
+                },
+                "DynamoDBConfig": {
+                    "AwsRegion": {
+                        "Fn::Select": [
+                            3,
+                            {
+                                "Fn::Split": [
+                                    ":",
+                                    {
+                                        "Fn::GetAtt": [
+                                            "OtherTestTable",
+                                            "Arn"
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    "TableName": {
+                        "Ref": "OtherTestTable"
+                    }
+                }
+            }
+        },
+        "GetOtherTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "OtherTestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "getOtherTest",
+                "TypeName": "Query",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "QueryGetOtherTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "QueryGetOtherTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "ListOtherTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "OtherTestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "listOtherTests",
+                "TypeName": "Query",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "QueryListOtherTestsRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "QueryListOtherTestsResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "CreateOtherTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "OtherTestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "createOtherTest",
+                "TypeName": "Mutation",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "MutationCreateOtherTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "MutationCreateOtherTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "UpdateOtherTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "OtherTestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "updateOtherTest",
+                "TypeName": "Mutation",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "MutationUpdateOtherTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "MutationUpdateOtherTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "DeleteOtherTestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "OtherTestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "deleteOtherTest",
+                "TypeName": "Mutation",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "MutationDeleteOtherTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "MutationDeleteOtherTestResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
         "BlogpostsResolver": {
             "Type": "AWS::AppSync::Resolver",
             "Properties": {
@@ -1228,6 +1902,58 @@
                 },
                 "ResponseMappingTemplateS3Location": {
                     "Ref": "CommentPostResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "TestcommentsResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "OtherTestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "comments",
+                "TypeName": "Test",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "TestCommentsRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "TestCommentsResponse"
+                }
+            },
+            "DependsOn": "GraphQLSchema"
+        },
+        "OtherTesttestResolver": {
+            "Type": "AWS::AppSync::Resolver",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DataSourceName": {
+                    "Fn::GetAtt": [
+                        "TestDataSource",
+                        "Name"
+                    ]
+                },
+                "FieldName": "test",
+                "TypeName": "OtherTest",
+                "RequestMappingTemplateS3Location": {
+                    "Ref": "OtherTestTestRequest"
+                },
+                "ResponseMappingTemplateS3Location": {
+                    "Ref": "OtherTestTestResponse"
                 }
             },
             "DependsOn": "GraphQLSchema"
