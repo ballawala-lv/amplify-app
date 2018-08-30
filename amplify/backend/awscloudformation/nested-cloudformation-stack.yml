@@ -1,0 +1,252 @@
+{
+	"AWSTemplateFormatVersion": "2010-09-09",
+	"Description": "Root stack for the Amplify AWS CloudFormation provider",
+	"Parameters": {
+		"DeploymentBucketName": {
+			"Description": "Name of the common deployment bucket provided by the parent stack",
+			"Type": "String",
+			"Default": "DeploymentBucket"
+		},
+		"AuthRoleName": {
+			"Type": "String",
+			"Default": "AuthRoleName"
+		},
+		"UnauthRoleName": {
+			"Type": "String",
+			"Default": "UnauthRoleName"
+		}
+	},
+	"Resources": {
+		"DeploymentBucket": {
+			"Type": "AWS::S3::Bucket",
+			"DeletionPolicy": "Retain",
+			"Properties": {
+				"BucketName": {
+					"Ref": "DeploymentBucketName"
+				}
+			}
+		},
+		"AuthRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"RoleName": {
+					"Ref": "AuthRoleName"
+				},
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Sid": "",
+							"Effect": "Allow",
+							"Principal": {
+								"Federated": "cognito-identity.amazonaws.com"
+							},
+							"Action": "sts:AssumeRoleWithWebIdentity",
+							"Condition": {
+								"ForAnyValue:StringLike": {
+									"cognito-identity.amazonaws.com:amr": "authenticated"
+								}
+							}
+						}
+					]
+				}
+			}
+		},
+		"UnauthRole": {
+			"Type": "AWS::IAM::Role",
+			"Properties": {
+				"RoleName": {
+					"Ref": "UnauthRoleName"
+				},
+				"AssumeRolePolicyDocument": {
+					"Version": "2012-10-17",
+					"Statement": [
+						{
+							"Sid": "",
+							"Effect": "Allow",
+							"Principal": {
+								"Federated": "cognito-identity.amazonaws.com"
+							},
+							"Action": "sts:AssumeRoleWithWebIdentity",
+							"Condition": {
+								"ForAnyValue:StringLike": {
+									"cognito-identity.amazonaws.com:amr": "unauthenticated"
+								}
+							}
+						}
+					]
+				}
+			}
+		},
+		"authcognitoda462043": {
+			"Type": "AWS::CloudFormation::Stack",
+			"Properties": {
+				"TemplateURL": "https://s3.amazonaws.com/amplifyapp-20180829173524-deployment/amplify-cfn-templates/auth/cognitoda462043-cloudformation-template.yml",
+				"Parameters": {
+					"identityPoolName": "cognitoda462043_identitypool_da462043",
+					"allowUnauthenticatedIdentities": false,
+					"thirdPartyAuth": false,
+					"lambdaLogPolicy": "cognitoda462043_lambda_log_policy",
+					"openIdLambdaRoleName": "cognitoda462043_openid_lambda_role",
+					"openIdRolePolicy": "cognitoda462043_openid_pass_role_policy",
+					"openIdLambdaIAMPolicy": "cognitoda462043_openid_lambda_iam_policy",
+					"openIdLogPolicy": "cognitoda462043_openid_lambda_log_policy",
+					"userPoolName": "cognitoda462043_userpool_da462043",
+					"autoVerifiedAttributes": "email",
+					"mfaConfiguration": "OFF",
+					"mfaTypes": "SMS Text Message",
+					"roleName": "cognitoda462043_sns-role",
+					"roleExternalId": "cognitoda462043_role_external_id",
+					"policyName": "cognitoda462043-sns-policy",
+					"smsAuthenticationMessage": "Your authentication code is {####}",
+					"smsVerificationMessage": "Your verification code is {####}",
+					"emailVerificationSubject": "Your verification code",
+					"emailVerificationMessage": "Your verification code is {####}",
+					"defaultPasswordPolicy": false,
+					"passwordPolicyMinLength": 8,
+					"passwordPolicyCharacters": "Requires Lowercase,Requires Uppercase,Requires Numbers,Requires Symbols",
+					"requiredAttributes": "email",
+					"userpoolClientName": "cognitoda462043_app_client",
+					"userpoolClientGenerateSecret": true,
+					"userpoolClientRefreshTokenValidity": 30,
+					"userpoolClientReadAttributes": "email",
+					"mfaLambdaRole": "cognitoda462043_totp_lambda_role",
+					"mfaLambdaLogPolicy": "cognitoda462043_totp_lambda_log_policy",
+					"mfaPassRolePolicy": "cognitoda462043_totp_pass_role_policy",
+					"mfaLambdaIAMPolicy": "cognitoda462043_totp_lambda_iam_policy",
+					"userpoolClientLambdaRole": "cognitoda462043_userpoolclient_lambda_role",
+					"userpoolClientLogPolicy": "cognitoda462043_userpoolclient_lambda_log_policy",
+					"userpoolClientLambdaPolicy": "cognitoda462043_userpoolclient_lambda_iam_policy",
+					"userpoolClientSetAttributes": false,
+					"useDefault": "default",
+					"unAuthRoleName": "amplifyapp-20180829173524-unauthRole",
+					"authRoleName": "amplifyapp-20180829173524-authRole",
+					"unAuthRoleArn": "arn:aws:iam::614167019250:role/amplifyapp-20180829173524-unauthRole",
+					"authRoleArn": "arn:aws:iam::614167019250:role/amplifyapp-20180829173524-authRole",
+					"resourceName": "cognitoda462043",
+					"authSelections": "identityPoolAndUserPool"
+				}
+			}
+		},
+		"apiamplifyapp": {
+			"Type": "AWS::CloudFormation::Stack",
+			"Properties": {
+				"TemplateURL": "https://s3.amazonaws.com/amplifyapp-20180829173524-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+				"Parameters": {
+					"AppSyncApiName": "amplifyapp",
+					"MutationCreateCommentResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.createComment.response.1535643631624",
+					"CommentPostResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Comment.post.response.1535643631624",
+					"schemaGraphql": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/schema.graphql.1535643631624",
+					"MutationDeleteCommentRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.deleteComment.request.1535643631624",
+					"MutationCreatePostRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.createPost.request.1535643631624",
+					"BlogPostsResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Blog.posts.response.1535643631624",
+					"MutationCreateBlogResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.createBlog.response.1535643631624",
+					"MutationDeleteBlogRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.deleteBlog.request.1535643631624",
+					"MutationCreateBlogRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.createBlog.request.1535643631624",
+					"BlogPostsRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Blog.posts.request.1535643631624",
+					"CommentPostRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Comment.post.request.1535643631624",
+					"MutationDeleteCommentResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.deleteComment.response.1535643631624",
+					"MutationUpdateCommentResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.updateComment.response.1535643631624",
+					"MutationUpdatePostResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.updatePost.response.1535643631624",
+					"PostBlogResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Post.blog.response.1535643631624",
+					"MutationCreateCommentRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.createComment.request.1535643631624",
+					"MutationDeletePostRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.deletePost.request.1535643631624",
+					"MutationDeleteBlogResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.deleteBlog.response.1535643631624",
+					"QueryGetPostRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.getPost.request.1535643631624",
+					"QueryGetCommentResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.getComment.response.1535643631624",
+					"PostCommentsResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Post.comments.response.1535643631624",
+					"MutationUpdateCommentRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.updateComment.request.1535643631624",
+					"QueryGetBlogResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.getBlog.response.1535643631624",
+					"QueryListPostsResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.listPosts.response.1535643631624",
+					"QueryListBlogsResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.listBlogs.response.1535643631624",
+					"QueryListCommentsResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.listComments.response.1535643631624",
+					"QueryListCommentsRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.listComments.request.1535643631624",
+					"QueryGetPostResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.getPost.response.1535643631624",
+					"QueryGetCommentRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.getComment.request.1535643631624",
+					"MutationCreatePostResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.createPost.response.1535643631624",
+					"MutationUpdateBlogResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.updateBlog.response.1535643631624",
+					"PostBlogRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Post.blog.request.1535643631624",
+					"MutationUpdatePostRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.updatePost.request.1535643631624",
+					"QueryGetBlogRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.getBlog.request.1535643631624",
+					"QueryListPostsRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.listPosts.request.1535643631624",
+					"MutationUpdateBlogRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.updateBlog.request.1535643631624",
+					"MutationDeletePostResponse": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Mutation.deletePost.response.1535643631624",
+					"QueryListBlogsRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Query.listBlogs.request.1535643631624",
+					"PostCommentsRequest": "s3://amplifyapp-20180829173524-deployment/amplify-appsync-files/Post.comments.request.1535643631624"
+				}
+			}
+		}
+	},
+	"Outputs": {
+		"Region": {
+			"Description": "CloudFormation provider root stack Region",
+			"Value": {
+				"Ref": "AWS::Region"
+			},
+			"Export": {
+				"Name": {
+					"Fn::Sub": "${AWS::StackName}-Region"
+				}
+			}
+		},
+		"StackName": {
+			"Description": "CloudFormation provider root stack ID",
+			"Value": {
+				"Ref": "AWS::StackName"
+			},
+			"Export": {
+				"Name": {
+					"Fn::Sub": "${AWS::StackName}-StackName"
+				}
+			}
+		},
+		"StackId": {
+			"Description": "CloudFormation provider root stack name",
+			"Value": {
+				"Ref": "AWS::StackId"
+			},
+			"Export": {
+				"Name": {
+					"Fn::Sub": "${AWS::StackName}-StackId"
+				}
+			}
+		},
+		"DeploymentBucketName": {
+			"Description": "CloudFormation provider root stack deployment bucket name",
+			"Value": {
+				"Ref": "DeploymentBucketName"
+			},
+			"Export": {
+				"Name": {
+					"Fn::Sub": "${AWS::StackName}-DeploymentBucketName"
+				}
+			}
+		},
+		"AuthRoleArn": {
+			"Value": {
+				"Fn::GetAtt": [
+					"AuthRole",
+					"Arn"
+				]
+			}
+		},
+		"UnauthRoleArn": {
+			"Value": {
+				"Fn::GetAtt": [
+					"UnauthRole",
+					"Arn"
+				]
+			}
+		},
+		"AuthRoleName": {
+			"Value": {
+				"Ref": "AuthRole"
+			}
+		},
+		"UnauthRoleName": {
+			"Value": {
+				"Ref": "UnauthRole"
+			}
+		}
+	}
+}

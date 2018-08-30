@@ -1,8 +1,15 @@
 import React, { Component } from 'react';
 import logo from './logo.svg';
-import Amplify from 'aws-amplify';
 import awsmobile from './aws-exports';
+import Amplify, { Auth } from 'aws-amplify';
+import aws_exports from './aws-exports';
+import {withAuthenticator } from 'aws-amplify-react';
 import './App.css';
+
+// GraphQL endpoint: https://ekm6fg4dcrfa5olovw7joczefq.appsync-api.us-east-1.amazonaws.com/graphql
+// GraphQL API KEY: da2-q6wyx3ufbnfdpfct5o7obr5z6a
+
+Amplify.configure(aws_exports);
 
 Amplify.configure(awsmobile)
 Amplify.Logger.LOG_LEVEL = 'DEBUG';
@@ -23,4 +30,4 @@ class App extends Component {
   }
 }
 
-export default App;
+export default withAuthenticator(App, { includeGreetings: true });

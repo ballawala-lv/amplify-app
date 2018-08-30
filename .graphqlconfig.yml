@@ -1,0 +1,11 @@
+amplifyapp:
+  schemaPath: amplify/backend/api/amplifyapp/schema.json
+  includes:
+    - 'amplify/backend/api/amplifyapp/schema.graphql'
+  excludes:
+    - amplify/node_modules/**
+  extensions:
+    amplify:
+      graphQLApiId: ahpdp5j2v5gcng4pkagcwn6rx4
+      codeGenTarget: typescript
+      generatedFileName: test.ts

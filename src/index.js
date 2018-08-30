@@ -4,5 +4,10 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const federated = {
+    facebook_app_id: '320065391877856',
+};
+
+
+ReactDOM.render(<App federated={federated}/>, document.getElementById('root'));
 registerServiceWorker();
